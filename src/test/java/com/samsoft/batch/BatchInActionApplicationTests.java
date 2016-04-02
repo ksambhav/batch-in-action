@@ -68,7 +68,7 @@ public class BatchInActionApplicationTests {
 		JobParametersBuilder jobParamBuilder = new JobParametersBuilder();
 
 		Date jobDateParam = DateUtils.round(new Date(), Calendar.HOUR_OF_DAY);
-		JobParameters params = jobParamBuilder.addDate("theDate", jobDateParam, false).toJobParameters();
+		JobParameters params = jobParamBuilder.addDate("theDate", jobDateParam, true).toJobParameters();
 		LOG.debug("Starting the job with params {}", params);
 		JobExecution execution = jobLauncher.run(employeeJob, params);
 		LOG.debug(" Job execution : {}", execution);
