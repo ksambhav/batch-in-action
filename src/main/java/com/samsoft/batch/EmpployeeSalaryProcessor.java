@@ -19,9 +19,9 @@ public class EmpployeeSalaryProcessor implements ItemProcessor<Employee, Employe
 	@Override
 	public Employee process(Employee item) throws Exception {
 		float percent = RandomUtils.nextFloat(1.01f, 1.99f);
-		log.debug("Processing Employee {} with {} percent hike", item.getId(), percent);
 		item.setSalary((int) (item.getSalary() * percent));
-		System.out.println("Incremented Salary of employee " + item.getId());
+		log.debug("Incremented Salary of employee " + item.getId());
+		item.setIncrement((percent - 1) * 100);
 		return item;
 	}
 

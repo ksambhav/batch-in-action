@@ -30,4 +30,5 @@ public class Employee {
 
 	private int salary;
 
+	private float increment;
 }

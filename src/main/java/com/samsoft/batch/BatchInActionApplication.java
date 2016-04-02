@@ -14,11 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @SpringBootApplication
 @EnableBatchProcessing
 public class BatchInActionApplication {
+
 
 	@Autowired
 	protected JobBuilderFactory jobBuilderFactory;
@@ -79,14 +79,7 @@ public class BatchInActionApplication {
 
 	@Bean
 	public ItemProcessor<Employee, Employee> salaryNotificatoinProcessor() {
-		return new ItemProcessor<Employee, Employee>() {
-
-			@Override
-			public Employee process(Employee item) throws Exception {
-				System.out.println("Sending Mail to " + item.getId());
-				return item;
-			}
-		};
+		return new EmployeeNotificationProcessor();
 	}
 
 	@Bean
@@ -99,7 +92,7 @@ public class BatchInActionApplication {
 				.<Employee,Employee> chunk(10)
 				.reader(jpaPagedItemReader)
 				.processor(salaryNotificatoinProcessor)
-				.taskExecutor(new SimpleAsyncTaskExecutor("gajodhar"))
+				//.taskExecutor(new SimpleAsyncTaskExecutor("sendNotificationStepExecutor"))
 				.build();
 		//@formatter:on
 	}

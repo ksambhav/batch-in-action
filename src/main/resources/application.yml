@@ -1,0 +1,13 @@
+spring:
+  batch:
+    job:
+      enabled: false
+  datasource:
+    username: postgres
+    password: password
+    url: jdbc:postgresql://localhost:5432/batch_in_action
+    platform: POSTGRESQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false

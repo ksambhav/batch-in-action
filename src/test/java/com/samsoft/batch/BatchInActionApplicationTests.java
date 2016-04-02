@@ -1,10 +1,12 @@
 package com.samsoft.batch;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jfairy.Fairy;
 import org.jfairy.producer.person.Person;
 import org.junit.Before;
@@ -29,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(classes = BatchInActionApplication.class)
 public class BatchInActionApplicationTests {
 
-	private static Logger log = LoggerFactory.getLogger(BatchInActionApplicationTests.class);
+	private static Logger LOG = LoggerFactory.getLogger(BatchInActionApplicationTests.class);
 
 	private static short count = 50;
 
@@ -56,7 +58,7 @@ public class BatchInActionApplicationTests {
 			list.add(e);
 		}
 		employeeRepository.save(list);
-		log.debug("Created {} fake employeees", count);
+		LOG.debug("Created {} fake employeees", count);
 	}
 
 	@Test
@@ -65,10 +67,11 @@ public class BatchInActionApplicationTests {
 
 		JobParametersBuilder jobParamBuilder = new JobParametersBuilder();
 
-		JobParameters params = jobParamBuilder.addDate("theDate", new Date()).toJobParameters();
-
+		Date jobDateParam = DateUtils.round(new Date(), Calendar.HOUR_OF_DAY);
+		JobParameters params = jobParamBuilder.addDate("theDate", jobDateParam, false).toJobParameters();
+		LOG.debug("Starting the job with params {}", params);
 		JobExecution execution = jobLauncher.run(employeeJob, params);
-		log.debug(" Job execution : {}", execution);
+		LOG.debug(" Job execution : {}", execution);
 	}
 
 }
