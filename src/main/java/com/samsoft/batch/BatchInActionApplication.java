@@ -2,7 +2,9 @@ package com.samsoft.batch;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -18,7 +20,6 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @EnableBatchProcessing
 public class BatchInActionApplication {
-
 
 	@Autowired
 	protected JobBuilderFactory jobBuilderFactory;
@@ -48,12 +49,19 @@ public class BatchInActionApplication {
 	}
 
 	@Bean
-	public Job employeeAppraisalJob(Step salaryIncrementStep, Step sendNotificationStep) {
+	public JobExecutionListener employeeJobExecutionListner() {
+		return new EmployeeJobExecutionListner();
+	}
+
+	@Bean
+	public Job employeeAppraisalJob(Step salaryIncrementStep, Step sendNotificationStep,
+			JobExecutionListener employeeJobExecutionListner) {
 		//@formatter:off
 		return jobBuilderFactory
 				.get("appraisalJob")
 				.start(salaryIncrementStep)
 				.next(sendNotificationStep)
+				.listener(employeeJobExecutionListner)
 				.build();
 		//@formatter:on
 	}
@@ -64,8 +72,14 @@ public class BatchInActionApplication {
 	}
 
 	@Bean
+	public ChunkListener salaryStepChunkListner() {
+		return new SalaryStepChunkListener();
+	}
+
+	@Bean
 	public Step salaryIncrementStep(JpaPagingItemReader<Employee> jpaPagedItemReader,
-			ItemProcessor<Employee, Employee> empployeeSalaryProcessor, JpaItemWriter<Employee> employeeItemWriter) {
+			ItemProcessor<Employee, Employee> empployeeSalaryProcessor, JpaItemWriter<Employee> employeeItemWriter,
+			ChunkListener salaryStepChunkListner) {
 		//@formatter:off
 		return stepBuilderFactory
 				.get("salaryIncrementStep")
@@ -73,6 +87,7 @@ public class BatchInActionApplication {
 				.reader(jpaPagedItemReader)
 				.processor(empployeeSalaryProcessor)
 				.writer(employeeItemWriter)
+				.listener(salaryStepChunkListner)
 				.build();
 		//@formatter:on
 	}
