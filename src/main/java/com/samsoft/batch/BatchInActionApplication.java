@@ -5,6 +5,7 @@ import javax.persistence.EntityManagerFactory;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -77,9 +78,14 @@ public class BatchInActionApplication {
 	}
 
 	@Bean
+	public SkipListener<Employee, Employee> salaryProcessorSkipListener() {
+		return new SalaryStepSkipListener();
+	}
+
+	@Bean
 	public Step salaryIncrementStep(JpaPagingItemReader<Employee> jpaPagedItemReader,
 			ItemProcessor<Employee, Employee> empployeeSalaryProcessor, JpaItemWriter<Employee> employeeItemWriter,
-			ChunkListener salaryStepChunkListner) {
+			ChunkListener salaryStepChunkListner, SkipListener<Employee, Employee> salaryStepSkipListener) {
 		//@formatter:off
 		return stepBuilderFactory
 				.get("salaryIncrementStep")
@@ -87,7 +93,11 @@ public class BatchInActionApplication {
 				.reader(jpaPagedItemReader)
 				.processor(empployeeSalaryProcessor)
 				.writer(employeeItemWriter)
-				.listener(salaryStepChunkListner)
+				.faultTolerant()
+				.skipLimit(2)
+				.skip(IllegalArgumentException.class)
+				.listener(salaryStepSkipListener) // skip listener
+				.listener(salaryStepChunkListner) // chunk listener
 				.build();
 		//@formatter:on
 	}

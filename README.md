@@ -1,8 +1,8 @@
 # batch-in-action
 
-####Spring Batch sample application.
+#### Spring Batch Sample application.
 
-#####Blog referred:- https://blog.codecentric.de/en/2012/03/transactions-in-spring-batch-part-1-the-basics/
+###### Blog referred/copied-from :- https://blog.codecentric.de/en/2012/03/transactions-in-spring-batch-part-1-the-basics/
 
 
 ##### Batch Transaction Boundaries
