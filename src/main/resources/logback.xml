@@ -2,7 +2,7 @@
 <configuration>
 	<include resource="org/springframework/boot/logging/logback/base.xml" />
 	<logger name="org.springframework" level="ERROR" />
-	<logger name="org.springframework.batch" level="DEBUG" />
+	<logger name="org.springframework.batch" level="WARN" />
 	<logger name="org.springframework.transaction" level="DEBUG" />
 	<logger name="org.hibernate" level="WARN" />
 	<logger name="ch.qos" level="ERROR" />

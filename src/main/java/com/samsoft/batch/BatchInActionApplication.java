@@ -10,6 +10,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
@@ -22,15 +23,22 @@ import org.springframework.context.annotation.Bean;
 @EnableBatchProcessing
 public class BatchInActionApplication {
 
+	private static final int CHUNK_SIZE = 10;
+
 	@Autowired
 	protected JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
 	protected StepBuilderFactory stepBuilderFactory;
 
+	@Autowired
+	protected JobExplorer jobExplorer;
+
 	public static void main(String[] args) {
 		SpringApplication.run(BatchInActionApplication.class, args);
 	}
+
+	/////// EMPLOYEE JOB START ////////////
 
 	@Bean
 	public JpaPagingItemReader<Employee> jpaPagedItemReader(EntityManagerFactory emf) {
@@ -89,13 +97,13 @@ public class BatchInActionApplication {
 		//@formatter:off
 		return stepBuilderFactory
 				.get("salaryIncrementStep")
-				.<Employee,Employee> chunk(5)
+				.<Employee,Employee> chunk(CHUNK_SIZE)
 				.reader(jpaPagedItemReader)
 				.processor(employeeSalaryProcessor)
+					.faultTolerant()
+					.skip(IllegalArgumentException.class)
+					.skipLimit(0)
 				.writer(employeeItemWriter)
-				.faultTolerant()
-				.skipLimit(2)
-				.skip(IllegalArgumentException.class)
 				.listener(salaryStepSkipListener) // skip listener
 				.listener(salaryStepChunkListner) // chunk listener
 				.build();
@@ -114,11 +122,12 @@ public class BatchInActionApplication {
 		//@formatter:off
 		return stepBuilderFactory
 				.get("sendNotificationStep")
-				.<Employee,Employee> chunk(10)
+				.<Employee,Employee> chunk(CHUNK_SIZE)
 				.reader(jpaPagedItemReader)
 				.processor(salaryNotificatoinProcessor)
-				//.taskExecutor(new SimpleAsyncTaskExecutor("sendNotificationStepExecutor"))
 				.build();
 		//@formatter:on
 	}
+
+	/////// EMPLOYEE JOB END ////////////
 }

@@ -3,7 +3,6 @@
  */
 package com.samsoft.batch;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -22,14 +21,13 @@ public class EmployeeSalaryProcessor implements ItemProcessor<Employee, Employee
 	@Override
 	public Employee process(Employee employee) throws Exception {
 
-		if (employee.getId() % 31 == 0) {
+		if (employee.getId() % 19 == 0) {
 			throw new IllegalArgumentException("Throwing exception at employee id " + employee.getId());
 		}
 
-		float percent = RandomUtils.nextFloat(1.01f, 1.99f);
-		employee.setSalary((int) (employee.getSalary() * percent));
+		employee.setSalary((int) (employee.getSalary() * 1.1));
 		log.debug("Incremented Salary of employee " + employee.getId());
-		employee.setIncrement(employee.getIncrement() + percent);
+		employee.setIncrement(10f);
 		return employee;
 	}
 

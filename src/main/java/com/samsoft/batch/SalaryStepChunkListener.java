@@ -31,7 +31,6 @@ public class SalaryStepChunkListener implements ChunkListener {
 	@Override
 	public void afterChunkError(ChunkContext context) {
 		LOG.error("afterChunkError " + context);
-
 	}
 
 }

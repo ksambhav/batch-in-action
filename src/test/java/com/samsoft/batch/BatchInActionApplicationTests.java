@@ -33,9 +33,9 @@ public class BatchInActionApplicationTests {
 
 	private static Logger LOG = LoggerFactory.getLogger(BatchInActionApplicationTests.class);
 
-	private static short count = 50;
+	private static final short COUNT = 20;
 
-	private static Fairy FAIRY = Fairy.create();
+	private static final Fairy FAIRY = Fairy.create();
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -48,17 +48,20 @@ public class BatchInActionApplicationTests {
 
 	@Before
 	public void init() {
-		List<Employee> list = new ArrayList<>(count);
 
-		for (int i = 0; i < count; i++) {
+		employeeRepository.deleteAll();
+
+		List<Employee> list = new ArrayList<>(COUNT);
+
+		for (int i = 0; i < COUNT; i++) {
 			Employee e = new Employee();
 			Person person = FAIRY.person();
 			e.setName(person.fullName());
-			e.setSalary(RandomUtils.nextInt(300000, 2000000));
+			e.setSalary(100);
 			list.add(e);
 		}
 		employeeRepository.save(list);
-		LOG.debug("Created {} fake employeees", count);
+		LOG.debug("Created {} fake employeees", COUNT);
 	}
 
 	@Test
@@ -67,8 +70,13 @@ public class BatchInActionApplicationTests {
 
 		JobParametersBuilder jobParamBuilder = new JobParametersBuilder();
 
-		Date jobDateParam = DateUtils.round(new Date(), Calendar.HOUR_OF_DAY);
-		JobParameters params = jobParamBuilder.addDate("theJobDate", jobDateParam, false).toJobParameters();
+		//@formatter:off
+		JobParameters params = 
+				jobParamBuilder
+				.addDate("theJobDate", DateUtils.round(new Date(), Calendar.HOUR_OF_DAY), true)
+				.addLong("randomLong", RandomUtils.nextLong(0l, 999999l), true)
+				.toJobParameters();
+		//@formatter:on
 		LOG.debug("Starting the job with params {}", params);
 		JobExecution execution = jobLauncher.run(employeeJob, params);
 		LOG.debug(" Job execution : {}", execution);
