@@ -68,8 +68,8 @@ public class BatchInActionApplication {
 	}
 
 	@Bean
-	public ItemProcessor<Employee, Employee> empployeeSalaryProcessor() {
-		return new EmpployeeSalaryProcessor();
+	public ItemProcessor<Employee, Employee> employeeSalaryProcessor() {
+		return new EmployeeSalaryProcessor();
 	}
 
 	@Bean
@@ -84,14 +84,14 @@ public class BatchInActionApplication {
 
 	@Bean
 	public Step salaryIncrementStep(JpaPagingItemReader<Employee> jpaPagedItemReader,
-			ItemProcessor<Employee, Employee> empployeeSalaryProcessor, JpaItemWriter<Employee> employeeItemWriter,
+			ItemProcessor<Employee, Employee> employeeSalaryProcessor, JpaItemWriter<Employee> employeeItemWriter,
 			ChunkListener salaryStepChunkListner, SkipListener<Employee, Employee> salaryStepSkipListener) {
 		//@formatter:off
 		return stepBuilderFactory
 				.get("salaryIncrementStep")
 				.<Employee,Employee> chunk(5)
 				.reader(jpaPagedItemReader)
-				.processor(empployeeSalaryProcessor)
+				.processor(employeeSalaryProcessor)
 				.writer(employeeItemWriter)
 				.faultTolerant()
 				.skipLimit(2)
